@@ -1,0 +1,55 @@
+---
+- name: Prepare the modules needed for vCenter operations
+  pip:
+    name: PyVmomi
+
+- name: Generate random password if was not yet defined as variable
+  set_fact:
+    dst_adm_pass: "{{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}"
+  when: (dst_adm_pass is not defined) or (dst_adm_pass | length == 0)
+
+- name: Cloning VM from the template
+  vmware_guest:
+    hostname: "{{ vc_server }}"
+    username: "{{ vc_user }}"
+    password: "{{ vc_password }}"
+    validate_certs: "{{ vc_validate_certs }}"
+    datacenter: "{{ vc_datacenter_name }}"
+    cluster: "{{ vc_datacenter_cluster_name }}"
+    folder: "{{ vc_datacenter_folder }}"
+    datastore: "{{ vc_datastore }}"
+    state: "{{ dst_instance_state }}"
+    template: "{{ src_template }}"
+    name: "{{ dst_instance_name }}"
+    disk:
+      - size_gb: "{{ dst_maindisk_size }}"
+        type: "{{ dst_provisioning_type }}"
+    networks:
+      - name: "{{ dst_network_name }}"
+        mac: "{{ dst_mac }}"
+        ip: "{{ dst_IP }}"
+        netmask: "{{ dst_IP_netmask }}"
+        gateway: "{{ dst_IP_gateway }}"
+        dvswitch_name: "{{ vc_vswitch_name }}"
+        wait_for_ip_address: "{{ wait_for_ip_address }}"
+    customization:
+      autologon: "{{ dst_autologon }}"
+      domain: "{{ dst_fqdn_domain }}"
+      password: "{{ dst_adm_pass }}"
+      dns_servers:
+        - "{{ dst_dns_1 }}"
+        - "{{ dst_dns_2 }}"
+      dns_suffix:
+        - "{{ dst_dns_suffix }}"
+      # runonce:
+      #   - powershell.exe -ExecutionPolicy Unrestricted -SkipNetworkProfileCheck -File C:\Windows\temp\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert -EnableCredSSP
+  delegate_to: localhost
+  no_log: False
+  register: deploy
+
+
+- name: Wait up to 3-4min for connection
+  wait_for_connection:
+    delay: 200
+    sleep: 20
+    timeout: 240

@@ -1,0 +1,29 @@
+---
+#VCenter parameters
+vc_datacenter_cluster_name: "{{ vc_datacenter_cluster_name }}"
+vc_datacenter_name: "{{ vc_datacenter_name }}"
+vc_server: "{{ vc_server }}"
+vc_datacenter_folder: "/"
+vc_datastore: "{{ vc_datastore }}"
+vc_vswitch_name: "{{ vc_vswitch_name }}"
+vc_user: Administrator@VSPHERE.LOCAL
+vc_validate_certs: no
+
+#Parameters of the destination VM to be deployed
+dst_IP: "{{ dst_IP }}"
+dst_IP_netmask: "{{ dst_IP_netmask }}"
+dst_IP_gateway: "{{ dst_IP_gateway }}"
+dst_mac: "0f:0c:ff:da:ff"
+dst_network_name: "{{ dst_network_name }}"
+dst_fqdn_domain: "{{ dst_fqdn_domain }}"
+dst_dns_1: "8.8.8.8"
+dst_dns_2: "4.4.4.4"
+dst_dns_suffix: "{{ dst_dns_suffix }}"
+dst_instance_name: "{{ dst_instance_name }}"
+dst_instance_state: poweredon
+dst_maindisk_size: 128  # [GB]
+dst_provisioning_type: thin
+dst_adm_pass: ""
+src_template: "{{ src_template }}"
+wait_for_ip_address: True
+dst_autologon: yes
